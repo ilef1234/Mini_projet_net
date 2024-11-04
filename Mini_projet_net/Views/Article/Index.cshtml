@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<Mini_projet_net.Models.Article>
+@inject SignInManager<IdentityUser> SignInManager;
+
+@{
+    ViewBag.Title = "Liste des articles";
+}
+
+<h1>Index</h1>
+
+<a asp-action="Index" asp-controller="Article">All Article</a>
+<form class="form-inline my-2 my-lg-0" asp-action="Search" asp-controller="Article">
+    <p>
+        <input size="30" placeholder="tapez un Nom" type="search" name="Designation" />
+        <select asp-items="ViewBag.CategorieId" name="CategorieId" size="1.5" style="width:300px; height:30px"></select>
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Recherche</button>
+    </p>
+</form>
+
+<div class="card-group">
+    @foreach (var article in Model)
+    {
+        var photoPath = "~/images/" + (article.Image ?? "noimage.jpg");
+        <div class="card m-3" style="min-width: 18rem; max-width:30.5%;">
+            <div class="card-header">
+                <h5><b>Désignation :</b> @article.Designation</h5>
+                <h5><b>Prix :</b> @article.Prix</h5>
+                <h5><b>Quantité :</b> @article.Quantite</h5>
+            </div>
+            <img class="card-img-top imageThumbnail" src="@photoPath" asp-append-version="true" />
+            <div class="card-footer text-center">
+                <a asp-controller="Article" asp-action="Details" asp-route-id="@article.articleId" class="btn btn-primary m-1">View</a>
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("User"))
+                {
+                    <a asp-controller="CommandeItem" asp-action="Index" asp-route-articleId="@article.articleId" class="btn btn-primary m-1">Add to Panier</a>
+                }
+
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <a asp-action="Edit" asp-controller="Article" class="btn btn-primary m-1" asp-route-id="@article.articleId">Edit</a>
+                    <a asp-action="Delete" asp-controller="Article" class="btn btn-danger m-1" asp-route-id="@article.articleId">Delete</a>
+                }
+            </div>
+        </div>
+    }
+</div>
